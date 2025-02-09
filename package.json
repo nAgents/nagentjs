@@ -1,0 +1,19 @@
+{
+  "name": "nagentjs",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "nagentjs – A modular Node.js framework for building AI agents with personality, knowledge retrieval (RAG), and LLM integration (Ollama, OpenAI, etc.).",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Eddy Dezuraud <eddy.dezuraud@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "undici": "^7.3.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}
