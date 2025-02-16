@@ -11,7 +11,9 @@
   "author": "Eddy Dezuraud <eddy.dezuraud@gmail.com>",
   "license": "ISC",
   "dependencies": {
-    "undici": "^7.3.0"
+    "ollama": "^0.5.13",
+    "undici": "^7.3.0",
+    "ws": "^8.18.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.9"

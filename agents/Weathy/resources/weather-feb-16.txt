@@ -1,0 +1,17 @@
+Prévisions météorologiques pour La Rochelle, France
+Date : Dimanche 16 février 2025
+
+Conditions actuelles :
+- Ensoleillé
+- Température : 3°C
+
+Prévisions pour la journée :
+- Matin : Ensoleillé
+- Après-midi : Devenant nuageux
+- Température maximale : 13°C
+- Température minimale : 4°C
+
+Alertes météorologiques :
+- Vigilance jaune : Crues en vigueur jusqu'à lundi, 0h00 CET.
+  Source : Météo-France
+  Détails : Des phénomènes habituels dans la région mais occasionnellement et localement dangereux sont prévus (exemple : montée des eaux). Soyez attentifs si vous pratiquez des activités sensibles au risque météorologique ou à proximité d'un rivage ou d'un cours d'eau. Tenez-vous au courant de l'évolution de la situation.
