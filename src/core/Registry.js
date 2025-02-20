@@ -74,20 +74,24 @@ export class Registry {
     const agent = this.agents[agentName];
     if (!agent) throw new Error(`❌ Agent '${agentName}' not found.`);
 
-    // Step 1: Ask which resources are needed
-    const resourceQueryPrompt = `You are assisting the agent "${agent.name}".`
-      + `\nHere is a user's question: "${prompt}"`
-      + `\nAvailable resources: ${agent.resources.join(", ")}`
-      + `\nWhich resources should be retrieved to answer the question?`
-      + `\nReturn a JSON object with:`
-      + `\n{ "needed_resources": ["filename1.txt", "filename2.pdf", ...] }`
-      + `\nIf no resources are needed, return an empty array.`;
+    let selectedResources = {};
+    let needed_resources = [];
 
-    let resourceResponse = await this.ollama.generateResponse(resourceQueryPrompt);
-    let { needed_resources } = JSON.parse(resourceResponse);
+    // Step 1: Ask which resources are needed ONLY if the agent has resources
+    if (agent.resources.length > 0) {
+      const resourceQueryPrompt = `You are assisting the agent "${agent.name}".`
+        + `\nHere is a user's question: "${prompt}"`
+        + `\nAvailable resources: ${agent.resources.join(", ")}`
+        + `\nWhich resources should be retrieved to answer the question?`
+        + `\nReturn a JSON object with:`
+        + `\n{ "needed_resources": ["filename1.txt", "filename2.pdf", ...] }`
+        + `\nIf no resources are needed, return an empty array.`;
+
+      let resourceResponse = await this.ollama.generateResponse(resourceQueryPrompt);
+      needed_resources = resourceResponse.data?.needed_resources || [];
+    }
 
     // Step 2: Retrieve only the necessary resource contents
-    let selectedResources = {};
     if (Array.isArray(needed_resources) && needed_resources.length > 0) {
       needed_resources.forEach((fileName) => {
         try {
@@ -103,7 +107,8 @@ export class Registry {
       + `\nDescription: ${agent.description}`
       + `\nInstruction: ${agent.instruction}`
       + `\nQuestion: "${prompt}"`
-      + `\nUsing the following relevant resources:\n${Object.entries(selectedResources).map(([file, content]) => `\n- ${file}: ${content.substring(0, 300)}...`).join("\n")}`
+      + `\n${agent.resources.length > 0 ? "You **must** use the following resources to answer this question. Do not assume lack of information if relevant data is present:" : "You do not have any additional resources, use your knowledge to answer."}`
+      + `\n${Object.entries(selectedResources).map(([file, content]) => `\n- ${file}: ${content.substring(0, 300)}...`).join("\n")}`
       + `\nReturn a JSON object in the following format:`
       + `\n${responseFormat}`;
 

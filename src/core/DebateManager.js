@@ -32,12 +32,11 @@ export class DebateManager {
     \n${presenterResponseFormat}`;
 
     let presenterResponse = await this.ollama.generateResponse(presenterPrompt);
-    if (typeof presenterResponse === "string") {
-      presenterResponse = this.extractValidJSON(presenterResponse);
-    }
-
-    if (presenterResponse.error) {
-      console.warn("⚠️ Error extracting JSON from Presenter:", presenterResponse.rawResponse);
+    // Ensure we use the extracted JSON data
+    if (presenterResponse.data) {
+      presenterResponse = presenterResponse.data;
+    } else {
+      console.warn("⚠️ Presenter response is not valid JSON:", presenterResponse.response);
       return;
     }
 
@@ -52,9 +51,6 @@ export class DebateManager {
     }`;
 
     let firstResponse = await this.registry.ask(first_agent, structured_prompt, responseFormat);
-    if (typeof firstResponse === "string") {
-      firstResponse = this.extractValidJSON(firstResponse);
-    }
 
     if (firstResponse.error) {
       console.warn("⚠️ Error extracting JSON from first agent:", firstResponse.rawResponse);
@@ -90,7 +86,7 @@ export class DebateManager {
           if (agreementCount[agentResponse.message] >= this.config.consensus) {
             console.log(`✅ Consensus reached: "${agentResponse.message}"`);
             const finalResponse = await this.formatFinalResponse(prompt, agentResponse.message, opinions);
-            onUpdate({ type: "consensus", result: finalResponse });
+            onUpdate({ type: "consensus", result: finalResponse.response });
             return finalResponse;
           }
         }
@@ -98,10 +94,16 @@ export class DebateManager {
     }
 
     const refinedSummary = await this.ollama.refineDebateSummary(Object.values(opinions));
+
+    if (typeof refinedSummary === "object" && refinedSummary.message) {
+        console.log(`🔍 Ollama Refined Summary: ${refinedSummary.message}`);
+        onUpdate({ type: "ollama_summary", summary: refinedSummary.message });
+        return refinedSummary.message;
+    }
+    
     console.log(`🔍 Ollama Refined Summary: ${refinedSummary}`);
     onUpdate({ type: "ollama_summary", summary: refinedSummary });
-
-    return this.formatFinalResponse(prompt, refinedSummary, opinions);
+    return refinedSummary;
   }
 
   async formatFinalResponse(prompt, conclusion, opinions) {
